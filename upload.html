@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>臺灣世界音樂地圖 – 上傳交換活動</title>
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <style>
+    /* 色彩變數 */
+    :root {
+      --celadon: #94d8bcff;
+      --flame: #e16036ff;
+      --indigo-dye: #08415cff;
+      --xanthous: #f3b61fff;
+      --quinacridone-magenta: #922d50ff;
+      --light-gray: #f5f5f5;
+      --dark-gray: #333333;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      height: 100%;
+      font-family: 'Noto Sans TC', '微軟正黑體', Arial, sans-serif;
+      background: rgba(148, 216, 188, 0.3); /* 改為 94d8bc 30% 不透明 */
+      color: var(--dark-gray);
+      overflow-x: hidden;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* 導覽列 */
+    .navbar {
+      background: #ffffff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 0.8rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .navbar h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--indigo-dye);
+    }
+    .navbar a {
+      margin-left: 1.5rem;
+      font-size: 1rem;
+      color: var(--dark-gray);
+      transition: color 0.2s;
+    }
+    .navbar a:hover {
+      color: var(--flame);
+    }
+
+    /* 主要容器 */
+    .container {
+      width: 90%;
+      max-width: 700px;
+      margin: 2rem auto;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      padding: 2rem;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--indigo-dye);
+    }
+    .section-title {
+      font-size: 1.2rem;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      color: var(--quinacridone-magenta);
+      font-weight: 500;
+    }
+    label {
+      display: block;
+      margin-top: 0.8rem;
+      font-size: 1rem;
+      color: #555555;
+    }
+    input[type="text"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.6rem;
+      margin-top: 0.3rem;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--indigo-dye);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    /* 搜尋結果列表 */
+    #resultsList {
+      list-style: none;
+      margin: 0.5rem 0;
+      padding: 0;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
+      max-height: 150px;
+      overflow-y: auto;
+      background: #ffffff;
+    }
+    #resultsList li {
+      padding: 0.6rem 0.8rem;
+      border-bottom: 1px solid #e0e0e0;
+      cursor: pointer;
+      font-size: 0.95rem;
+      color: var(--dark-gray);
+    }
+    #resultsList li:last-child {
+      border-bottom: none;
+    }
+    #resultsList li:hover {
+      background: var(--celadon);
+      color: #ffffff;
+    }
+
+    /* 按鈕 */
+    button {
+      margin-top: 1.2rem;
+      padding: 0.7rem 1.4rem;
+      background: var(--flame);
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: background 0.2s, transform 0.2s;
+      cursor: pointer;
+    }
+    button:hover {
+      background: var(--xanthous);
+      transform: translateY(-1px);
+    }
+
+    /* 地圖區域 */
+    #pick-map {
+      width: 100%;
+      height: 300px;
+      border-radius: 4px;
+      margin-top: 0.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .info {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #555555;
+    }
+
+    /* 回饋訊息 */
+    .message {
+      margin-top: 1rem;
+      font-size: 1rem;
+    }
+    .message.success {
+      color: #28a745;
+    }
+    .message.error {
+      color: #dc3545;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #888888;
+      margin: 2rem 0 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 導覽列 -->
+  <nav class="navbar">
+    <h1>音樂交換地圖</h1>
+    <div>
+      <a href="index.html">🏠 首頁</a>
+      <a href="upload.html">➕ 紀錄你換的歌</a>
+      <a href="explore.html">🔍 瀏覽地圖</a>
+    </div>
+  </nav>
+
+  <!-- 內容容器 -->
+  <div class="container">
+    <h2>➕ 紀錄你換的歌</h2>
+
+    <!-- 搜尋地點 -->
+    <div class="section-title">搜尋交換地點</div>
+    <label for="searchInput">搜尋地標或地址</label>
+    <div style="position: relative; margin-bottom: 0.5rem;">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="輸入地標或地址"
+        style="width: 100%; padding: 0.6rem; border-radius: 4px; border: 1px solid #cccccc;"
+      />
+      <button
+        type="button"
+        id="searchBtn"
+        style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%);"
+      >
+        搜尋
+      </button>
+    </div>
+    <ul id="resultsList"></ul>
+
+    <!-- 地圖選點 -->
+    <div class="section-title">地圖上點擊選擇</div>
+    <div id="pick-map"></div>
+    <p class="info">
+      在地圖上點擊以標記位置，將自動取得經緯度。<br />
+      經度：<span id="lat-display">尚未選擇</span> 、緯度：<span id="lng-display">尚未選擇</span>
+    </p>
+
+    <!-- 表單欄位 -->
+    <form id="exchange-form">
+      <label for="userA">交換者 A 名稱（你）</label>
+      <input type="text" id="userA" name="userA" placeholder="例如：Alice" required />
+
+      <label for="userB">交換者 B 名稱</label>
+      <input type="text" id="userB" name="userB" placeholder="例如：Bob" required />
+
+      <label for="partnerNationality">交換對象 B 的國籍</label>
+      <select id="partnerNationality" name="partnerNationality" required>
+        <option value="">請選擇國籍</option>
+        <option value="Taiwan">Taiwan</option>
+        <option value="Japan">Japan</option>
+        <option value="USA">USA</option>
+        <option value="Canada">Canada</option>
+        <option value="Korea">Korea</option>
+        <option value="France">France</option>
+        <option value="Germany">Germany</option>
+      </select>
+
+      <label for="musicLink">音樂連結 (Spotify/YouTube 等)</label>
+      <input
+        type="text"
+        id="musicLink"
+        name="musicLink"
+        placeholder="https://"
+        required
+      />
+
+      <label for="description">文字描述 (選填)</label>
+      <textarea
+        id="description"
+        name="description"
+        rows="3"
+        placeholder="敘述此次交換的心得、背景…"
+      ></textarea>
+
+      <!-- 隱藏欄位：儲存經緯度 -->
+      <input type="hidden" id="latitude" name="latitude" />
+      <input type="hidden" id="longitude" name="longitude" />
+
+      <button type="submit">紀錄音樂帶來的相遇</button>
+    </form>
+
+    <p id="form-info" class="message"></p>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">© 2025 臺灣世界音樂地圖 MVP</div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    (function() {
+      const dummyEvents = [];
+      const events = [...dummyEvents];
+
+      // 初始化地圖
+      const pickMap = L.map('pick-map').setView([25.0330, 121.5654], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(pickMap);
+
+      let pickMarker = null;
+
+      // 搜尋地標或地址
+      document.getElementById('searchBtn').addEventListener('click', async function() {
+        const query = document.getElementById('searchInput').value.trim();
+        const resultsList = document.getElementById('resultsList');
+        resultsList.innerHTML = '';
+        if (!query) {
+          alert('請先輸入地標或地址');
+          return;
+        }
+        try {
+          const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(query)}&limit=5`);
+          const data = await resp.json();
+          if (data.length === 0) {
+            alert('找不到相符位置');
+            return;
+          }
+          data.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = item.display_name;
+            li.setAttribute('data-location', JSON.stringify({ lat: item.lat, lon: item.lon }));
+            li.style.padding = '0.5rem 0.8rem';
+            li.style.cursor = 'pointer';
+            li.addEventListener('click', function() {
+              const loc = JSON.parse(li.getAttribute('data-location'));
+              const latitude = parseFloat(loc.lat);
+              const longitude = parseFloat(loc.lon);
+              if (pickMarker) {
+                pickMarker.setLatLng([latitude, longitude]);
+              } else {
+                pickMarker = L.marker([latitude, longitude]).addTo(pickMap);
+              }
+              pickMap.setView([latitude, longitude], 13);
+              document.getElementById('latitude').value = latitude.toFixed(6);
+              document.getElementById('longitude').value = longitude.toFixed(6);
+              document.getElementById('lat-display').innerText = latitude.toFixed(6);
+              document.getElementById('lng-display').innerText = longitude.toFixed(6);
+              resultsList.innerHTML = '';
+            });
+            resultsList.appendChild(li);
+          });
+        } catch (err) {
+          console.error('搜尋失敗：', err);
+          alert('搜尋失敗，請稍後再試');
+        }
+      });
+
+      // 點地圖取座標
+      pickMap.on('click', function(e) {
+        const { lat, lng } = e.latlng;
+        if (pickMarker) {
+          pickMarker.setLatLng(e.latlng);
+        } else {
+          pickMarker = L.marker(e.latlng).addTo(pickMap);
+        }
+        document.getElementById('latitude').value = lat.toFixed(6);
+        document.getElementById('longitude').value = lng.toFixed(6);
+        document.getElementById('lat-display').innerText = lat.toFixed(6);
+        document.getElementById('lng-display').innerText = lng.toFixed(6);
+      });
+
+      // 處理表單提交
+      const form = document.getElementById('exchange-form');
+      const formInfo = document.getElementById('form-info');
+
+      form.addEventListener('submit', function(evt) {
+        evt.preventDefault();
+        formInfo.innerText = '';
+        formInfo.className = 'message';
+
+        const userA = document.getElementById('userA').value.trim();
+        const userB = document.getElementById('userB').value.trim();
+        const partnerNationality = document.getElementById('partnerNationality').value;
+        const musicLink = document.getElementById('musicLink').value.trim();
+        const description = document.getElementById('description').value.trim();
+        const latitude = parseFloat(document.getElementById('latitude').value);
+        const longitude = parseFloat(document.getElementById('longitude').value);
+
+        if (!latitude || !longitude) {
+          alert('請先在地圖上點擊，選擇交換地點！');
+          return;
+        }
+
+        let locationCountry = '未知';
+        if (
+          latitude >= 21 && latitude <= 25.5 &&
+          longitude >= 119 && longitude <= 122.5
+        ) {
+          locationCountry = 'Taiwan';
+        } else if (
+          latitude >= 34 && latitude <= 43 &&
+          longitude >= 127 && longitude <= 145
+        ) {
+          locationCountry = 'Japan';
+        } else if (
+          latitude >= 24 && latitude <= 50 &&
+          longitude >= -125 && longitude <= -66
+        ) {
+          locationCountry = 'USA';
+        }
+
+        const newEvent = {
+          id: Date.now().toString(),
+          userA,
+          userB,
+          partnerNationality,
+          latitude,
+          longitude,
+          locationCountry,
+          musicLink,
+          description,
+          createdAt: new Date().toISOString().split('T')[0]
+        };
+        events.push(newEvent);
+
+        formInfo.classList.add('success');
+        formInfo.innerText = '✅ 已成功新增至地圖 (假資料)！';
+
+        form.reset();
+        if (pickMarker) {
+          pickMap.removeLayer(pickMarker);
+          pickMarker = null;
+        }
+        document.getElementById('lat-display').innerText = '尚未選擇';
+        document.getElementById('lng-display').innerText = '尚未選擇';
+      });
+    })();
+  </script>
+</body>
+</html>

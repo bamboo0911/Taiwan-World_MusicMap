@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>地圖探索</title>
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <style>
+    /* 色彩變數 */
+    :root {
+      --celadon: #94d8bcff;
+      --flame: #e16036ff;
+      --indigo-dye: #08415cff;
+      --xanthous: #f3b61fff;
+      --quinacridone-magenta: #922d50ff;
+      --light-gray: #f5f5f5;
+      --dark-gray: #333333;
+    }
+    /* Reset & 基本排版 */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      height: 100%;
+      font-family: 'Noto Sans TC', '微軟正黑體', Arial, sans-serif;
+      background: rgba(148, 216, 188, 0.3); /* 改為 94d8bc 30% 不透明 */
+      color: var(--dark-gray);
+      overflow-x: hidden;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* 導覽列 */
+    .navbar {
+      background: #ffffff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 0.8rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .navbar h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--indigo-dye);
+    }
+    .navbar a {
+      margin-left: 1.5rem;
+      font-size: 1rem;
+      color: var(--dark-gray);
+      transition: color 0.2s;
+    }
+    .navbar a:hover {
+      color: var(--flame);
+    }
+
+    /* 主要容器 */
+    .container {
+      width: 95%;
+      max-width: 1000px;
+      margin: 2rem auto;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      padding: 2rem;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--indigo-dye);
+    }
+    .section-title {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+      color: var(--quinacridone-magenta);
+      font-weight: 500;
+    }
+    #explore-map {
+      width: 100%;
+      height: 550px;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .info {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #555555;
+    }
+
+    /* Popup 自訂樣式 */
+    .leaflet-popup-content-wrapper {
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .leaflet-popup-content {
+      color: var(--dark-gray);
+      font-size: 0.95rem;
+    }
+    .leaflet-popup-content a {
+      color: var(--flame);
+      text-decoration: none;
+    }
+    .leaflet-popup-content a:hover {
+      text-decoration: underline;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #888888;
+      margin: 2rem 0 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 導覽列 -->
+  <nav class="navbar">
+    <h1>音樂交換地圖</h1>
+    <div>
+      <a href="index.html">🏠 首頁</a>
+      <a href="upload.html">➕ 上傳活動</a>
+      <a href="explore.html">🔍 瀏覽地圖</a>
+    </div>
+  </nav>
+
+  <!-- 內容容器 -->
+  <div class="container">
+    <h2>🔍 地圖探索</h2>
+    <div class="section-title">查看交換紀錄</div>
+    <div id="explore-map"></div>
+    <p class="info">點擊地圖上的標記即可查看交換詳情。</p>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">© 2025 臺灣世界音樂地圖 MVP</div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    (function() {
+      // 假資料：示範兩筆交換事件
+      const dummyEvents = [
+        {
+          id: '1',
+          userA: 'Alice',
+          userB: 'Bob',
+          partnerNationality: 'Japan',
+          latitude: 25.0330,
+          longitude: 121.5654,
+          locationCountry: 'Taiwan',
+          musicLink: 'https://youtu.be/dQw4w9WgXcQ',
+          description: '在台北101前與 Bob 交換了一首經典歌曲。',
+          createdAt: '2025-05-20',
+        },
+        {
+          id: '2',
+          userA: 'Charlie',
+          userB: 'Diana',
+          partnerNationality: 'USA',
+          latitude: 35.6895,
+          longitude: 139.6917,
+          locationCountry: 'Japan',
+          musicLink: 'https://open.spotify.com/track/abcdefg',
+          description: '在東京澀谷與 Diana 分享新發現的獨立音樂。',
+          createdAt: '2025-05-25',
+        }
+      ];
+
+      // 初始化地圖
+      const exploreMap = L.map('explore-map').setView([25.0330, 121.5654], 3);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(exploreMap);
+
+      // 渲染假資料標記
+      dummyEvents.forEach(evt => {
+        const lat = evt.latitude;
+        const lng = evt.longitude;
+        const popupHtml = `
+          <div style="color: var(--dark-gray);">
+            <strong style="color: var(--indigo-dye);">${evt.userA} ↔ ${evt.userB}</strong><br/>
+            <em>對象國籍：</em><span style="color: var(--indigo-dye);">${evt.partnerNationality}</span><br/>
+            <em>地點國家：</em><span style="color: var(--indigo-dye);">${evt.locationCountry}</span><br/>
+            <em>時間：</em>${evt.createdAt}<br/>
+            <em>音樂連結：</em><a href="${evt.musicLink}" target="_blank">${evt.musicLink}</a><br/>
+            ${evt.description ? `<em>描述：</em>${evt.description}<br/>` : ''}
+          </div>
+        `;
+        L.marker([lat, lng]).addTo(exploreMap).bindPopup(popupHtml);
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>臺灣世界音樂地圖 – 首頁</title>
+  <style>
+    /* 色彩變數 */
+    :root {
+      --celadon: #94d8bcff;
+      --flame: #e16036ff;
+      --indigo-dye: #08415cff;
+      --xanthous: #f3b61fff;
+      --quinacridone-magenta: #922d50ff;
+      --light-gray: #f5f5f5;
+      --dark-gray: #333333;
+    }
+    /* Reset & 基本排版 */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      height: 100%;
+      font-family: 'Noto Sans TC', '微軟正黑體', Arial, sans-serif;
+      background: rgba(148, 216, 188, 0.3); /* 改為 94d8bc 30% 不透明 */
+      color: var(--dark-gray);
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* 導覽列 */
+    .navbar {
+      background: #ffffff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 0.8rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .navbar h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--indigo-dye);
+    }
+    .navbar a {
+      margin-left: 1.5rem;
+      font-size: 1rem;
+      color: var(--dark-gray);
+      transition: color 0.2s;
+    }
+    .navbar a:hover {
+      color: var(--flame);
+    }
+
+    /* 主要容器 */
+    .container {
+      width: 90%;
+      max-width: 700px;
+      margin: 3rem auto;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      padding: 2rem;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--indigo-dye);
+    }
+    .container p {
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      color: #555555;
+    }
+
+    /* 教學步驟 */
+    .tutorial-step {
+      margin-bottom: 2rem;
+    }
+    .tutorial-step h3 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+      color: var(--quinacridone-magenta);
+      font-weight: 500;
+    }
+    .tutorial-step p {
+      font-size: 1rem;
+      margin-left: 1rem;
+      color: #666666;
+    }
+
+    /* 按鈕群組 */
+    .button-group {
+      text-align: center;
+      margin-top: 2rem;
+    }
+    .button-group a {
+      display: inline-block;
+      margin: 0 0.8rem;
+      padding: 0.6rem 1.4rem;
+      background: var(--flame);
+      color: #ffffff;
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .button-group a:hover {
+      background: var(--xanthous);
+      transform: translateY(-1px);
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #888888;
+      margin: 3rem 0 1rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- 導覽列 -->
+  <nav class="navbar">
+    <h1>音樂交換地圖</h1>
+    <div>
+      <a href="index.html">🏠 首頁</a>
+      <a href="upload.html">➕ 上傳活動</a>
+      <a href="explore.html">🔍 瀏覽地圖</a>
+    </div>
+  </nav>
+
+  <!-- 內容容器 -->
+  <div class="container">
+    <h2>臺灣世界音樂地圖</h2>
+    <p>在這裡，你可以分享與他人交換音樂的故事，並在地圖上留下你的足跡；也能探索其他用戶在世界各地的交換活動。透過簡潔的介面，輕鬆上傳與瀏覽，打造純粹的交流體驗。</p>
+
+    <div class="tutorial-step">
+      <h3>Step 1. 我跟他分享這首歌！</h3>
+      <p>點擊上方「➕ 上傳活動」，這次交換音樂的經驗。</p>
+    </div>
+
+    <div class="tutorial-step">
+      <h3>Step 2. 看看其他人都換了些什麼？</h3>
+      <p>點擊導覽列「🔍 瀏覽地圖」，查看大家上傳的紀錄</p>
+    </div>
+
+    <div class="tutorial-step">
+      <h3>Step 3. 分享這段由音樂牽起的跨國友誼。</h3>
+      <p>快去找一位朋友聊音樂吧🫶</p>
+    </div>
+
+    <div class="button-group">
+      <a href="upload.html">➕ 上傳活動</a>
+      <a href="explore.html">🔍 瀏覽地圖</a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">© 2025 臺灣世界音樂地圖 MVP</div>
+</body>
+</html>

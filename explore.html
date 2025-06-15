@@ -2,6 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>地圖探索</title>
   <!-- Leaflet CSS -->
   <link
@@ -16,193 +17,1052 @@
       --indigo-dye: #08415cff;
       --xanthous: #f3b61fff;
       --quinacridone-magenta: #922d50ff;
-      --light-gray: #f5f5f5;
-      --dark-gray: #333333;
+      --light-gray: #f8f8f9;
+      --dark-gray: #2d3748;
+      --border-color: #e2e8f0;
+      --text-secondary: #64748b;
     }
+    
     /* Reset & 基本排版 */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
+    
     html, body {
       height: 100%;
-      font-family: 'Noto Sans TC', '微軟正黑體', Arial, sans-serif;
-      background: rgba(148, 216, 188, 0.3); /* 改為 94d8bc 30% 不透明 */
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans TC', '微軟正黑體', sans-serif;
+      background: linear-gradient(135deg, rgba(148, 216, 188, 0.1) 0%, rgba(243, 182, 31, 0.05) 100%);
       color: var(--dark-gray);
-      overflow-x: hidden;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
+    
     a {
       text-decoration: none;
       color: inherit;
     }
 
-    /* 導覽列 */
+    /* 導覽列優化 */
     .navbar {
-      background: #ffffff;
-      border-bottom: 1px solid #e0e0e0;
-      padding: 0.8rem 2rem;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    
+    .navbar-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 100;
     }
+    
     .navbar h1 {
-      font-size: 1.4rem;
-      font-weight: 600;
-      color: var(--indigo-dye);
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--indigo-dye), var(--quinacridone-magenta));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
+    
+    .navbar-links {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
     .navbar a {
-      margin-left: 1.5rem;
-      font-size: 1rem;
+      font-size: 0.95rem;
       color: var(--dark-gray);
-      transition: color 0.2s;
-    }
-    .navbar a:hover {
-      color: var(--flame);
-    }
-
-    /* 主要容器 */
-    .container {
-      width: 95%;
-      max-width: 1000px;
-      margin: 2rem auto;
-      background: #ffffff;
+      transition: all 0.2s ease;
+      padding: 0.75rem 1rem;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      padding: 2rem;
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 1rem;
-      font-size: 1.8rem;
-      font-weight: 600;
-      color: var(--indigo-dye);
-    }
-    .section-title {
-      font-size: 1.2rem;
-      margin-bottom: 0.5rem;
-      color: var(--quinacridone-magenta);
       font-weight: 500;
     }
+    
+    .navbar a:hover {
+      color: var(--flame);
+      background: rgba(225, 96, 54, 0.08);
+    }
+
+    /* 主要內容區域 */
+    .main-content {
+      min-height: calc(100vh - 120px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 容器優化 */
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 2rem auto;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+      padding: 3rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      flex: 1;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--indigo-dye), var(--quinacridone-magenta));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+
+    .section-title {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      color: var(--quinacridone-magenta);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+    }
+
+    .section-title::before {
+      content: '🎵';
+      margin-right: 0.5rem;
+    }
+
+    /* 統計資訊優化 */
+    .stats-bar {
+      background: linear-gradient(135deg, var(--celadon), var(--xanthous));
+      color: #ffffff;
+      padding: 1.5rem;
+      border-radius: 16px;
+      margin-bottom: 2rem;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      box-shadow: 0 8px 25px rgba(148, 216, 188, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stats-bar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      animation: shimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0% { left: -100%; }
+      50% { left: 100%; }
+      100% { left: 100%; }
+    }
+
+    /* 篩選控制項優化 */
+    .filter-controls {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 2rem;
+      border-radius: 16px;
+      margin-bottom: 2rem;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+      border: 1px solid var(--border-color);
+    }
+    
+    .filter-row {
+      display: flex;
+      gap: 2rem;
+      align-items: end;
+      flex-wrap: wrap;
+    }
+    
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      min-width: 200px;
+    }
+    
+    .filter-group label {
+      font-size: 1rem;
+      color: var(--dark-gray);
+      font-weight: 600;
+    }
+    
+    .filter-group select {
+      padding: 0.75rem;
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      font-size: 0.95rem;
+      background: rgba(255, 255, 255, 0.9);
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .filter-group select:focus {
+      border-color: var(--celadon);
+      box-shadow: 0 0 0 4px rgba(148, 216, 188, 0.15);
+    }
+
+    /* 地圖容器優化 */
+    .map-container {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+      border: 2px solid var(--border-color);
+      margin: 2rem 0;
+    }
+    
     #explore-map {
       width: 100%;
-      height: 550px;
-      border-radius: 4px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      height: 650px;
+      border-radius: 20px;
     }
+
     .info {
-      margin-top: 0.5rem;
-      font-size: 0.9rem;
-      color: #555555;
+      margin-top: 1.5rem;
+      font-size: 1rem;
+      color: var(--text-secondary);
+      text-align: center;
+      line-height: 1.6;
     }
 
-    /* Popup 自訂樣式 */
+    /* 自訂 Popup 樣式優化 */
     .leaflet-popup-content-wrapper {
-      background: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .leaflet-popup-content {
-      color: var(--dark-gray);
-      font-size: 0.95rem;
-    }
-    .leaflet-popup-content a {
-      color: var(--flame);
-      text-decoration: none;
-    }
-    .leaflet-popup-content a:hover {
-      text-decoration: underline;
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+      border: 2px solid rgba(148, 216, 188, 0.3);
+      backdrop-filter: blur(25px);
+      overflow: hidden;
+      max-width: none !important;
+      max-height: none !important;
     }
 
-    /* Footer */
+    .leaflet-popup {
+      margin-bottom: 20px !important;
+    }
+
+    .leaflet-popup-content {
+      margin: 0 !important;
+      line-height: 1.4 !important;
+      width: auto !important;
+      overflow-y: auto;
+      max-height: calc(100vh - 120px);
+    }
+
+    .leaflet-popup-tip {
+      background: rgba(255, 255, 255, 0.98);
+      border: 2px solid rgba(148, 216, 188, 0.3);
+      border-top: none;
+      border-right: none;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .custom-popup {
+      padding: 0;
+      font-family: inherit;
+      position: relative;
+      overflow: hidden;
+      transition: font-size 0.3s ease;
+    }
+
+    /* 響應式字體調整 */
+    .custom-popup.small-screen {
+      font-size: 0.85rem;
+    }
+
+    .custom-popup.medium-screen {
+      font-size: 0.9rem;
+    }
+
+    .custom-popup.large-screen {
+      font-size: 1rem;
+    }
+    
+    /* 響應式調整 - 優化自動調整 */
+    @media (max-width: 480px) {
+      .leaflet-popup-content {
+        max-height: calc(100vh - 80px);
+      }
+      
+      .custom-popup {
+        font-size: 0.8rem !important;
+      }
+      
+      .story-title {
+        font-size: 1.2rem;
+      }
+      
+      .info-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+      
+      .connection-visual {
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+      
+      .connection-line {
+        width: 60px;
+        height: 3px;
+        margin: 0;
+        transform: rotate(90deg);
+      }
+      
+      .story-header {
+        padding: 1rem;
+      }
+      
+      .story-content {
+        padding: 1rem;
+      }
+      
+      .music-link {
+        padding: 0.8rem 1.2rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .custom-popup {
+        font-size: 0.75rem !important;
+      }
+      
+      .story-title {
+        font-size: 1.1rem;
+      }
+      
+      .story-header {
+        padding: 0.8rem;
+      }
+      
+      .story-content {
+        padding: 0.8rem;
+      }
+    }
+
+    /* 確保滾動條樣式 */
+    .leaflet-popup-content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .leaflet-popup-content::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 3px;
+    }
+
+    .leaflet-popup-content::-webkit-scrollbar-thumb {
+      background: var(--celadon);
+      border-radius: 3px;
+    }
+
+    .leaflet-popup-content::-webkit-scrollbar-thumb:hover {
+      background: var(--flame);
+    }
+
+    /* 故事卡片頭部 */
+    .story-header {
+      background: linear-gradient(135deg, var(--celadon), var(--xanthous));
+      padding: 1.5rem;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .story-header::before {
+      content: '♪';
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      font-size: 4rem;
+      opacity: 0.2;
+      transform: rotate(15deg);
+    }
+    
+    .story-header::after {
+      content: '♫';
+      position: absolute;
+      bottom: -5px;
+      left: -5px;
+      font-size: 2.5rem;
+      opacity: 0.15;
+      transform: rotate(-10deg);
+    }
+    
+    .story-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .story-title::before {
+      content: '🎵';
+      font-size: 1.2rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    
+    .story-subtitle {
+      font-size: 0.95rem;
+      opacity: 0.9;
+      font-weight: 500;
+    }
+    
+    /* 故事內容區域 */
+    .story-content {
+      padding: 1.5rem;
+    }
+    
+    /* 人物連接區域 */
+    .connection-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    
+    .person {
+      background: linear-gradient(135deg, var(--indigo-dye), var(--quinacridone-magenta));
+      color: white;
+      padding: 0.75rem 1rem;
+      border-radius: 25px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      position: relative;
+      min-width: 80px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(146, 45, 80, 0.25);
+    }
+    
+    .connection-line {
+      flex: 1;
+      height: 3px;
+      background: linear-gradient(90deg, var(--celadon), var(--xanthous), var(--celadon));
+      margin: 0 1rem;
+      border-radius: 2px;
+      position: relative;
+      animation: flow 3s ease-in-out infinite;
+    }
+    
+    .connection-line::after {
+      content: '🎶';
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1rem;
+      animation: bounce 2s ease-in-out infinite;
+    }
+    
+    @keyframes flow {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-3px); }
+    }
+    
+    /* 資訊區塊 */
+    .info-section {
+      margin-bottom: 1.25rem;
+    }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    
+    .info-card {
+      background: rgba(148, 216, 188, 0.08);
+      border: 1px solid rgba(148, 216, 188, 0.2);
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    
+    .info-card:hover {
+      background: rgba(148, 216, 188, 0.15);
+      transform: translateY(-2px);
+    }
+    
+    .info-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .info-label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.25rem;
+    }
+    
+    .info-value {
+      font-size: 0.95rem;
+      color: var(--dark-gray);
+      font-weight: 700;
+    }
+    
+    /* 音樂連結區域 */
+    .music-section {
+      background: linear-gradient(135deg, rgba(225, 96, 54, 0.08), rgba(243, 182, 31, 0.08));
+      border-radius: 16px;
+      padding: 1.25rem;
+      text-align: center;
+      margin-bottom: 1.25rem;
+      border: 1px solid rgba(225, 96, 54, 0.15);
+    }
+    
+    .music-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: linear-gradient(135deg, var(--flame), var(--xanthous));
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(225, 96, 54, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .music-link::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.6s ease;
+    }
+    
+    .music-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(225, 96, 54, 0.4);
+    }
+    
+    .music-link:hover::before {
+      left: 100%;
+    }
+    
+    .music-icon {
+      font-size: 1.2rem;
+      animation: rotate 3s linear infinite;
+    }
+    
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    /* 故事描述區域 */
+    .story-description {
+      background: rgba(255, 255, 255, 0.7);
+      border-left: 4px solid var(--celadon);
+      padding: 1.25rem;
+      border-radius: 0 12px 12px 0;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    
+    .story-description::before {
+      content: '💭';
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      background: white;
+      border-radius: 50%;
+      padding: 0.25rem;
+      font-size: 1rem;
+    }
+    
+    .description-text {
+      font-style: italic;
+      color: var(--dark-gray);
+      line-height: 1.6;
+      font-size: 0.95rem;
+      margin: 0;
+    }
+    
+    /* 時間標記 */
+    .timestamp {
+      text-align: center;
+      padding: 0.75rem;
+      background: rgba(8, 65, 92, 0.05);
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 8px;
+      position: relative;
+    }
+    
+    .timestamp::before {
+      content: '📅';
+      margin-right: 0.5rem;
+    }
+
+    /* 自訂標記樣式 */
+    .custom-marker {
+      background: linear-gradient(135deg, var(--flame), var(--xanthous));
+      width: 35px;
+      height: 35px;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      border: 3px solid white;
+      box-shadow: 0 4px 15px rgba(225, 96, 54, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: bounce-marker 2s ease-in-out infinite;
+    }
+    
+    .custom-marker::after {
+      content: '🎵';
+      transform: rotate(45deg);
+      font-size: 1rem;
+    }
+    
+    @keyframes bounce-marker {
+      0%, 100% { transform: rotate(-45deg) translateY(0); }
+      50% { transform: rotate(-45deg) translateY(-5px); }
+    }
+
+    /* 響應式調整 */
+    @media (max-width: 480px) {
+      .custom-popup {
+        min-width: 280px;
+        max-width: 320px;
+      }
+      
+      .info-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+      
+      .connection-visual {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .connection-line {
+        width: 60px;
+        height: 3px;
+        margin: 0;
+        transform: rotate(90deg);
+      }
+      
+      .story-header {
+        padding: 1.25rem;
+      }
+      
+      .story-content {
+        padding: 1.25rem;
+      }
+    }
+
+    /* Footer 優化 */
     .footer {
       text-align: center;
-      font-size: 0.85rem;
-      color: #888888;
-      margin: 2rem 0 1rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      padding: 2rem 0;
+      background: rgba(255, 255, 255, 0.5);
+      border-top: 1px solid var(--border-color);
+      margin-top: auto;
+    }
+
+    /* 響應式設計 */
+    @media (max-width: 768px) {
+      .navbar-content {
+        padding: 0 1rem;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .navbar h1 {
+        font-size: 1.3rem;
+      }
+      
+      .navbar-links {
+        gap: 0;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .navbar a {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.75rem;
+      }
+      
+      .container {
+        margin: 1rem;
+        padding: 2rem 1.5rem;
+        border-radius: 16px;
+      }
+      
+      h2 {
+        font-size: 1.8rem;
+      }
+      
+      .section-title {
+        font-size: 1.1rem;
+      }
+      
+      .filter-row {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+      }
+      
+      .filter-group {
+        min-width: auto;
+      }
+      
+      #explore-map {
+        height: 450px;
+      }
+      
+      .stats-bar {
+        font-size: 1rem;
+        padding: 1.25rem;
+      }
+      
+      .custom-popup {
+        min-width: 250px;
+        padding: 1.25rem;
+      }
+      
+      .popup-header {
+        font-size: 1.1rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .container {
+        margin: 0.5rem;
+        padding: 1.5rem 1rem;
+      }
+      
+      h2 {
+        font-size: 1.6rem;
+      }
+      
+      .navbar-content {
+        padding: 0 0.75rem;
+      }
+      
+      #explore-map {
+        height: 350px;
+      }
+      
+      .filter-controls {
+        padding: 1.5rem;
+      }
+      
+      .custom-popup {
+        min-width: 220px;
+        padding: 1rem;
+      }
+      
+      .popup-field {
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+      
+      .popup-label {
+        min-width: auto;
+      }
     }
   </style>
 </head>
 <body>
+  <div class="main-content">
+    <!-- 導覽列 -->
+    <nav class="navbar">
+      <div class="navbar-content">
+        <h1>音樂交換地圖</h1>
+        <div class="navbar-links">
+          <a href="index.html">🏠 首頁</a>
+          <a href="upload.html">➕ 上傳活動</a>
+          <a href="explore.html">🔍 瀏覽地圖</a>
+        </div>
+      </div>
+    </nav>
 
-  <!-- 導覽列 -->
-  <nav class="navbar">
-    <h1>音樂交換地圖</h1>
-    <div>
-      <a href="index.html">🏠 首頁</a>
-      <a href="upload.html">➕ 上傳活動</a>
-      <a href="explore.html">🔍 瀏覽地圖</a>
+    <!-- 內容容器 -->
+    <div class="container">
+      <h2>🔍 地圖探索</h2>
+      
+      <!-- 統計資訊 -->
+      <div class="stats-bar">
+        <span id="total-events">載入中...</span> 個音樂交換故事正在地圖上閃閃發光 ✨
+      </div>
+      
+      <!-- 篩選控制項 -->
+      <div class="filter-controls">
+        <div class="section-title">篩選交換紀錄</div>
+        <div class="filter-row">
+          <div class="filter-group">
+            <label for="country-filter">依國籍篩選</label>
+            <select id="country-filter">
+              <option value="">所有國籍</option>
+              <option value="Taiwan">Taiwan</option>
+              <option value="Japan">Japan</option>
+              <option value="USA">USA</option>
+              <option value="Canada">Canada</option>
+              <option value="Korea">Korea</option>
+              <option value="France">France</option>
+              <option value="Germany">Germany</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="location-filter">依地點篩選</label>
+            <select id="location-filter">
+              <option value="">所有地點</option>
+              <option value="Taiwan">Taiwan</option>
+              <option value="Japan">Japan</option>
+              <option value="USA">USA</option>
+              <option value="Canada">Canada</option>
+              <option value="Korea">Korea</option>
+              <option value="France">France</option>
+              <option value="Germany">Germany</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <div class="section-title">查看交換紀錄</div>      
+      <div class="map-container">
+        <div id="explore-map"></div>
+      </div>
+      <p class="info">點擊地圖上的標記即可查看交換詳情。使用上方篩選器來找到特定類型的交換紀錄。</p>
     </div>
-  </nav>
-
-  <!-- 內容容器 -->
-  <div class="container">
-    <h2>🔍 地圖探索</h2>
-    <div class="section-title">查看交換紀錄</div>
-    <div id="explore-map"></div>
-    <p class="info">點擊地圖上的標記即可查看交換詳情。</p>
   </div>
-
+  
   <!-- Footer -->
   <div class="footer">© 2025 臺灣世界音樂地圖 MVP</div>
-
+  
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="dummyEvents.js"></script>
   <script>
     (function() {
-      // 假資料：示範兩筆交換事件
-      const dummyEvents = [
-        {
-          id: '1',
-          userA: 'Alice',
-          userB: 'Bob',
-          partnerNationality: 'Japan',
-          latitude: 25.0330,
-          longitude: 121.5654,
-          locationCountry: 'Taiwan',
-          musicLink: 'https://youtu.be/dQw4w9WgXcQ',
-          description: '在台北101前與 Bob 交換了一首經典歌曲。',
-          createdAt: '2025-05-20',
-        },
-        {
-          id: '2',
-          userA: 'Charlie',
-          userB: 'Diana',
-          partnerNationality: 'USA',
-          latitude: 35.6895,
-          longitude: 139.6917,
-          locationCountry: 'Japan',
-          musicLink: 'https://open.spotify.com/track/abcdefg',
-          description: '在東京澀谷與 Diana 分享新發現的獨立音樂。',
-          createdAt: '2025-05-25',
-        }
-      ];
-
+      let allMarkers = [];
+      let currentMarkers = [];
+      
       // 初始化地圖
       const exploreMap = L.map('explore-map').setView([25.0330, 121.5654], 3);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(exploreMap);
 
-      // 渲染假資料標記
-      dummyEvents.forEach(evt => {
-        const lat = evt.latitude;
-        const lng = evt.longitude;
-        const popupHtml = `
-          <div style="color: var(--dark-gray);">
-            <strong style="color: var(--indigo-dye);">${evt.userA} ↔ ${evt.userB}</strong><br/>
-            <em>對象國籍：</em><span style="color: var(--indigo-dye);">${evt.partnerNationality}</span><br/>
-            <em>地點國家：</em><span style="color: var(--indigo-dye);">${evt.locationCountry}</span><br/>
-            <em>時間：</em>${evt.createdAt}<br/>
-            <em>音樂連結：</em><a href="${evt.musicLink}" target="_blank">${evt.musicLink}</a><br/>
-            ${evt.description ? `<em>描述：</em>${evt.description}<br/>` : ''}
+      // 更新統計資訊
+      function updateStats() {
+        document.getElementById('total-events').textContent = currentMarkers.length;
+      }
+
+      // 創建自訂彈出視窗內容
+      function createPopupContent(evt) {
+        return `
+          <div class="custom-popup">
+            <div class="story-header">
+              <div class="story-title">${evt.userA} ↔ ${evt.userB}</div>
+              <div class="story-subtitle">音樂交換的美好時光</div>
+            </div>
+            
+            <div class="story-content">
+              <!-- 人物連接視覺 -->
+              <div class="connection-visual">
+                <div class="person">${evt.userA}</div>
+                <div class="connection-line"></div>
+                <div class="person">${evt.userB}</div>
+              </div>
+              
+              <!-- 資訊卡片區域 -->
+              <div class="info-grid">
+                <div class="info-card">
+                  <span class="info-icon">🌍</span>
+                  <div class="info-label">對象國籍</div>
+                  <div class="info-value">${evt.partnerNationality}</div>
+                </div>
+                <div class="info-card">
+                  <span class="info-icon">📍</span>
+                  <div class="info-label">交換地點</div>
+                  <div class="info-value">${evt.locationCountry}</div>
+                </div>
+              </div>
+              
+              ${evt.description ? `
+              <div class="story-description">
+                <p class="description-text">${evt.description}</p>
+              </div>
+              ` : ''}
+              
+              <!-- 音樂播放區域 -->
+              <div class="music-section">
+                <a href="${evt.musicLink}" target="_blank" class="music-link">
+                  <span class="music-icon">🎵</span>
+                  聆聽這首歌
+                </a>
+              </div>
+              
+              <!-- 時間戳記 -->
+              <div class="timestamp">${evt.createdAt}</div>
+            </div>
           </div>
         `;
-        L.marker([lat, lng]).addTo(exploreMap).bindPopup(popupHtml);
-      });
+      }
+
+      // 渲染標記
+      function renderMarkers(events) {
+        // 清除現有標記
+        currentMarkers.forEach(marker => exploreMap.removeLayer(marker));
+        currentMarkers = [];
+        
+        // 添加新標記
+        events.forEach(evt => {
+          const marker = L.marker([evt.latitude, evt.longitude])
+            .addTo(exploreMap)
+            .bindPopup(createPopupContent(evt), {
+              maxWidth: 'none',
+              maxHeight: 'none',
+              autoPan: true,
+              autoPanPadding: [20, 20],
+              closeButton: true,
+              autoClose: true,
+              className: 'custom-popup-wrapper',
+              offset: [0, -10]
+            });
+          
+          // 自動調整彈出視窗大小
+          marker.on('popupopen', function(e) {
+            const popup = e.popup;
+            const map = e.target._map;
+            
+            setTimeout(() => {
+              const mapContainer = map.getContainer();
+              const mapRect = mapContainer.getBoundingClientRect();
+              const popupElement = popup._container;
+              
+              if (popupElement && mapRect) {
+                const padding = 40;
+                const availableWidth = mapRect.width - (padding * 2);
+                const availableHeight = mapRect.height - (padding * 2);
+                
+                const minWidth = 280;
+                const maxWidth = Math.min(450, availableWidth);
+                const maxHeight = availableHeight;
+                
+                let optimalWidth = maxWidth;
+                if (mapRect.width <= 480) {
+                  optimalWidth = Math.min(300, availableWidth);
+                } else if (mapRect.width <= 768) {
+                  optimalWidth = Math.min(350, availableWidth);
+                }
+                
+                const popupContent = popupElement.querySelector('.leaflet-popup-content-wrapper');
+                if (popupContent) {
+                  popupContent.style.maxWidth = `${optimalWidth}px`;
+                  popupContent.style.maxHeight = `${maxHeight}px`;
+                  popupContent.style.width = `${Math.max(minWidth, optimalWidth)}px`;
+                  
+                  const customPopup = popupContent.querySelector('.custom-popup');
+                  if (customPopup) {
+                    const scaleFactor = Math.min(1, optimalWidth / 400);
+                    customPopup.style.fontSize = `${Math.max(0.85, scaleFactor)}rem`;
+                  }
+                }
+                
+                const popupRect = popupElement.getBoundingClientRect();
+                if (popupRect.height > maxHeight) {
+                  const popupLatLng = popup.getLatLng();
+                  const containerPoint = map.latLngToContainerPoint(popupLatLng);
+                  const offsetY = (popupRect.height / 2) + padding;
+                  const adjustedPoint = L.point(containerPoint.x, containerPoint.y - offsetY);
+                  const adjustedLatLng = map.containerPointToLatLng(adjustedPoint);
+                  
+                  map.panTo(adjustedLatLng, {
+                    animate: true,
+                    duration: 0.3
+                  });
+                }
+              }
+            }, 50);
+          });
+          
+          currentMarkers.push(marker);
+        });
+        
+        updateStats();
+      }
+
+      // 篩選功能
+      function applyFilters() {
+        const countryFilter = document.getElementById('country-filter').value;
+        const locationFilter = document.getElementById('location-filter').value;
+        
+        let filteredEvents = dummyEvents;
+        
+        if (countryFilter) {
+          filteredEvents = filteredEvents.filter(evt => evt.partnerNationality === countryFilter);
+        }
+        
+        if (locationFilter) {
+          filteredEvents = filteredEvents.filter(evt => evt.locationCountry === locationFilter);
+        }
+        
+        renderMarkers(filteredEvents);
+      }
+
+      // 初始渲染
+      renderMarkers(dummyEvents);
+      
+      // 綁定篩選事件
+      document.getElementById('country-filter').addEventListener('change', applyFilters);
+      document.getElementById('location-filter').addEventListener('change', applyFilters);
     })();
   </script>
 </body>
